@@ -1,8 +1,10 @@
 package edfi.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class GradingPeriod {
 
 	private String gradingPeriodDescriptor;
