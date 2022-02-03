@@ -22,17 +22,18 @@ import edfi.dto.Section;
 import edfi.dto.Student;
 import edfi.dto.StudentSchoolAssociation;
 import edfi.dto.StudentSectionAssociation;
+import edfi.repository.StudentRepository;
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor(onConstructor = @__({ @Autowired }))
 public class StudentService {
 
-	@Autowired
-	ObjectMapper mapper;
+	private ObjectMapper mapper;
+	private StudentRepository repository;
 
 	public String readFile(MultipartFile inputExcel, String type) throws IOException {
-		
+
 		String json = null;
 
 		CSVReader csvReader = new CSVReaderBuilder(new InputStreamReader(inputExcel.getInputStream())).withSkipLines(1)
@@ -50,7 +51,7 @@ public class StudentService {
 				Student student = new Student(studentUniqueId, birthDate, firstName, lastSurname);
 				students.add(student);
 			}
-			json =  mapper.writeValueAsString(students);
+			json = mapper.writeValueAsString(students);
 			break;
 
 		case "STUDENTSCHOOLASSOCIATIONS":
@@ -115,6 +116,14 @@ public class StudentService {
 			break;
 		}
 		return json;
+	}
+
+	public String getAuthenticationToken(String clientId, String clientSecret) {
+		return repository.getAuthenticationToken(clientId, clientSecret);
+	}
+
+	public String pushDataToODS(String token, String json) {
+		return repository.pushDataToODS(token, json);
 	}
 
 }

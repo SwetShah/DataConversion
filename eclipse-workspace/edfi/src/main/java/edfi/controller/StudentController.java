@@ -3,6 +3,7 @@ package edfi.controller;
 import javax.websocket.server.PathParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,10 +24,23 @@ public class StudentController {
 	@Autowired
 	private StudentService service;
 
+	final private String clientId = "BWPR66FxvGjY";
+	final private String clientSecret = "xp7pP1JTTkltpJU5ytKsAiY4";
+
 	@PostMapping("/import/{type}")
-	public String importStudentDetails(@RequestParam("file") MultipartFile inputExcel, @PathVariable("type") String type)
-			throws Exception {
-		return service.readFile(inputExcel, type);
+	public String importStudentDetails(@RequestParam("file") MultipartFile inputExcel,
+			@PathVariable("type") String type) throws Exception {
+
+		String jsonData = service.readFile(inputExcel, type);
+		if (StringUtils.isEmpty(jsonData)) {
+			return "Error occured while reading excel file";
+		}
+
+		String token = service.getAuthenticationToken(clientId, clientSecret);
+		if (StringUtils.isEmpty(token)) {
+			return "Error occured while fetching authentication token";
+		}
+		return service.pushDataToODS(token, jsonData);
 	}
 
 //	@PostMapping("/import/student/school/association")
